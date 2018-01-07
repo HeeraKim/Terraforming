@@ -70,12 +70,9 @@ public final class BaseStart extends Start {
 		slider.setMax(200);
 		slider.setValue(planetData.num("radius").doubleValue());
 		slider.valueProperty().addListener(e->{
-			planetData.updateNumber("radius", slider.getValue());
-		});
-		planetData.addNumberEvent((key, num) -> {
 			try {
-			slider.setValue(num.doubleValue());
-			planet[0].updateRadius(num.doubleValue());
+				planetData.updateNumber("radius", slider.getValue());
+				planet[0].updateRadius(slider.getValue());
 			} catch (Exception exception) {
 				throw new RuntimeException(exception);
 			}
@@ -103,9 +100,6 @@ public final class BaseStart extends Start {
 				// Remove previous sphere
 				panePlanet.getChildren().remove(planet[0].sphere());
 				
-				// Create new sphere and store into array
-				planet[0] = new PlanetSphere();
-				
 				// Clear data
 				planetData.clear();
 				
@@ -118,6 +112,9 @@ public final class BaseStart extends Start {
 				
 				// Add new sphere to the pane
 				panePlanet.getChildren().add(planet[0].sphere());
+				
+				// Update slider value
+				slider.setValue(planetData.num("radius").doubleValue());
 			} catch (Exception exception) {
 				throw new RuntimeException(exception);
 			}
