@@ -10,7 +10,8 @@ import javafx.scene.Scene;
 public interface Page {
 	/**
 	 * @return JavaFX scene
+	 * @throws Exception 
 	 * @since 1.0.0
 	 */
-	public Scene scene();
+	public Scene scene() throws Exception;
 }
