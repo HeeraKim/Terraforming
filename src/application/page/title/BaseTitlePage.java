@@ -1,4 +1,4 @@
-package application.page.initial;
+package application.page.title;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,32 +11,28 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
-/**
- * Primitive initial page <br />
- * The scene is cached.
- * @author Rin
- * @version 1.0.0
- */
-public final class BaseInitial extends Initial {
+public final class BaseTitlePage extends TitlePage {
 
 	@Override
-	public Scene scene() {
-		// Build cache if does not exist
-		if (cache.isEmpty()) {
-			buildCache();
-		}
-		
-		// Return cached scene
-		return cache.get(0);
+	public void display(Stage stage) {
+		stage.setScene(this.scene());
 	}
-
+	
 	@Override
 	public void addNewEvent(PlainEvent event) {
 		newEvents.add(event);
 	}
 
-	private void buildCache() {
+	private Scene scene() {
+		// Return cached scene
+		if (this.cache.isEmpty() == false) {
+			return cache.get(0);
+		}
+
+		// Build cache and return:
+		
 		// Width for buttons
 		final double buttonWidth = 200;
 
@@ -54,14 +50,14 @@ public final class BaseInitial extends Initial {
 
 		// Label to display main title
 		final Label lTitle = new Label("Terraforming");
-		lTitle.setStyle("-fx-font-size: "+titleTextSize);
+		lTitle.setStyle("-fx-font-size: " + titleTextSize);
 
 		// Button for new game
 		final Button bNew = new Button("New");
 		bNew.setPrefWidth(buttonWidth);
 		bNew.setPrefHeight(buttonHeight);
-		bNew.setStyle("-fx-font-size: "+buttonTextSize);
-		bNew.setOnAction(e->{
+		bNew.setStyle("-fx-font-size: " + buttonTextSize);
+		bNew.setOnAction(e -> {
 			newEvents.forEach(event -> {
 				event.handle();
 			});
@@ -71,13 +67,13 @@ public final class BaseInitial extends Initial {
 		final Button bContinue = new Button("Continue");
 		bContinue.setPrefWidth(buttonWidth);
 		bContinue.setPrefHeight(buttonHeight);
-		bContinue.setStyle("-fx-font-size: "+buttonTextSize);
+		bContinue.setStyle("-fx-font-size: " + buttonTextSize);
 
 		// Button for setting
 		final Button bSetting = new Button("Setting");
 		bSetting.setPrefWidth(buttonWidth);
 		bSetting.setPrefHeight(buttonHeight);
-		bSetting.setStyle("-fx-font-size: "+buttonTextSize);
+		bSetting.setStyle("-fx-font-size: " + buttonTextSize);
 
 		// GridPane to store buttons
 		final GridPane gridButtons = new GridPane();
@@ -95,12 +91,13 @@ public final class BaseInitial extends Initial {
 		// Scene
 		final Scene scene = new Scene(pane);
 		
-		// Cache the scene
-		cache.add(scene);
+		// Store cache
+		this.cache.add(scene);
+		
+		// Return scene
+		return this.cache.get(0);
 	}
 
+	private final List<Scene> cache = new ArrayList<>();
 	private final List<PlainEvent> newEvents = new ArrayList<>();
-
-	private final List<Scene> cache = new ArrayList<>(1);
-
 }

@@ -1,12 +1,14 @@
-package application.page.start;
+package application.page.initialplanet;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import application.data.PlanetData;
-import application.data.update.RandomDataUpdate;
-import application.page.component.sphere.PlanetSphere;
-import application.page.component.stat.BaseStat;
+import application.planet.Planet;
+import application.planet.strategy.execution.PlanetRandomize;
+import application.planet.strategy.execution.PlanetReset;
+import application.planet.strategy.execution.PlanetSyncSlide;
+import application.planet.strategy.node.BasePlanetNode;
+import application.planet.strategy.node.InitialStatPlanetNode;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -19,46 +21,45 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
 /**
- * Realization of Start Page. <br />
+ * Realization of InitialPlanetPage.  <br />
  * The scene is cached.
  * @author Rin
  * @version 1.0.0
  */
-public final class BaseStart extends Start {
-
-	public BaseStart(PlanetData planetData) {
-		this.planetData = planetData;
-	}
+public final class BaseInitialPlanetPage extends InitialPlanetPage {
 	
+	public BaseInitialPlanetPage(Planet planet) {
+		this.planet = planet;
+	}
+
 	@Override
-	public Scene scene() throws Exception {
-		// Build cache if does not exist
-		if (cache.isEmpty()) {
-			buildCache();
+	public void display(Stage stage) throws Exception {
+		stage.setScene(this.scene());
+	}
+
+	private Scene scene() throws Exception {
+		// Return cached scene
+		if (cache.isEmpty() == false) {
+			return cache.get(0);
 		}
 		
-		// Return cached scene
-		return cache.get(0);
-	}
+		// Reset planet
+		planet.execute(new PlanetReset());
 
-	private void buildCache() throws Exception {
-		// Clear data
-		planetData.clear();
+		// Randomize planet
+		planet.execute(new PlanetRandomize());
 		
-		// Update data randomly.
-		new RandomDataUpdate(planetData).apply();
+		// Build scene and cache it:
 		
-		// Custom sphere
-		planet[0] = new PlanetSphere();
-		planet[0].updateRadius(planetData.num("radius").doubleValue());
-
 		// StackPane for sphere
 		final StackPane panePlanet = new StackPane();
-		panePlanet.getChildren().add(planet[0].sphere());
 		panePlanet.setPrefSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
+		panePlanet.getChildren().add(planet.node(new BasePlanetNode()));
 
 		// TextField to name the planet
 		final TextField tfPlanetName = new TextField();
@@ -68,24 +69,13 @@ public final class BaseStart extends Start {
 		final Slider slider = new Slider();
 		slider.setMin(30);
 		slider.setMax(200);
-		slider.setValue(planetData.num("radius").doubleValue());
-		slider.valueProperty().addListener(e->{
-			try {
-				planetData.updateNumber("radius", slider.getValue());
-				planet[0].updateRadius(slider.getValue());
-			} catch (Exception exception) {
-				throw new RuntimeException(exception);
-			}
-		});
-		
+
 		// Observable list for status
 		final ObservableList<Node> obsStats = FXCollections.observableArrayList();
-		// Populate random generated datas:
-		// temperature
-		obsStats.add(new BaseStat(-100, 90, planetData.num("temperature").doubleValue()).node());
-		// Test
-		obsStats.add(new BaseStat(-100, 90, -30).node());
-		obsStats.add(new BaseStat(-100, 90, 80).node());
+		obsStats.add(planet.node(new InitialStatPlanetNode("temperature", "c", -100, 90)));
+		obsStats.add(planet.node(new InitialStatPlanetNode("pressure", "atm", 0, 10)));
+		obsStats.add(planet.node(new InitialStatPlanetNode("oxygenConcentration", "%", 0, 100)));
+		obsStats.add(planet.node(new InitialStatPlanetNode("gravity", "G", 0.1, 5)));
 
 		// ListView for status
 		final ListView<Node> lvStats = new ListView<>();
@@ -95,30 +85,6 @@ public final class BaseStart extends Start {
 		// Button for random
 		final Button bRandom = new Button("Random");
 		bRandom.setMinWidth(100);
-		bRandom.setOnAction(e->{
-			try {
-				// Remove previous sphere
-				panePlanet.getChildren().remove(planet[0].sphere());
-				
-				// Clear data
-				planetData.clear();
-				
-				// Update data randomly.
-				new RandomDataUpdate(planetData).apply();
-				
-				// Custom sphere
-				planet[0] = new PlanetSphere();
-				planet[0].updateRadius(planetData.num("radius").doubleValue());
-				
-				// Add new sphere to the pane
-				panePlanet.getChildren().add(planet[0].sphere());
-				
-				// Update slider value
-				slider.setValue(planetData.num("radius").doubleValue());
-			} catch (Exception exception) {
-				throw new RuntimeException(exception);
-			}
-		});
 
 		// Button for next
 		final Button bNext = new Button("Next");
@@ -155,14 +121,37 @@ public final class BaseStart extends Start {
 
 		// Scene
 		final Scene scene = new Scene(pane);
-
+		
 		// Cache the scene
-		cache.add(scene);
+		this.cache.add(scene);
+		
+		// Synchronize slider and planet radius
+		planet.execute(new PlanetSyncSlide(slider));
+		
+		// Handle event when random button is clicked.
+		bRandom.setOnAction(e->{
+			try {
+				handleRandomEvent(planet, slider, panePlanet);
+			} catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		});
+		
+		return this.cache.get(0);
 	}
 	
-	private final PlanetData planetData;
+	private void handleRandomEvent(Planet planet, Slider slider, Pane panePlanet) throws Exception {
+		// Reset planet
+		planet.execute(new PlanetReset());
+		
+		// Randomize planet
+		planet.execute(new PlanetRandomize());
+		
+		// Synchronize slider and planet radius
+		planet.execute(new PlanetSyncSlide(slider));
+	}
 
-	private final List<Scene> cache = new ArrayList<>(1);
-	private final PlanetSphere[] planet = new PlanetSphere[1];
-
+	private final Planet planet;
+	
+	private final List<Scene> cache = new ArrayList<>();
 }

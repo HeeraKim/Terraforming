@@ -1,11 +1,11 @@
 package application;
 
-import application.data.PlanetData;
-import application.nio.archive.ObjectSerialization;
-import application.page.initial.BaseInitial;
-import application.page.initial.Initial;
-import application.page.start.BaseStart;
-import application.page.start.Start;
+import application.page.initialplanet.BaseInitialPlanetPage;
+import application.page.initialplanet.InitialPlanetPage;
+import application.page.title.BaseTitlePage;
+import application.page.title.TitlePage;
+import application.planet.BasePlanet;
+import application.planet.Planet;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -13,38 +13,40 @@ public class Main extends Application {
 	@Override
 	public void start(Stage stage) {
 		try {
-			// Path to the planet data
-			final String planetDataPath = "terraforming.bin";
+			// Planet
+			final Planet planet = new BasePlanet();
 			
-			// Load the data
-			final PlanetData planetData = (PlanetData) new ObjectSerialization().load(planetDataPath, new PlanetData());
+			// TitlePage
+			final TitlePage titlePage = new BaseTitlePage();
 			
-			// Plain pages
-			final Initial initial = new BaseInitial();
-			final Start start = new BaseStart(planetData);
+			// InitialPlanetPage
+			final InitialPlanetPage initialPlanetPage = new BaseInitialPlanetPage(planet);
 			
-			// Navigate to Start page from initial page
-			initial.addNewEvent(()->{
+			// From TitlePage to InitialPlanetPage
+			titlePage.addNewEvent(()->{
 				try {
-					stage.setScene(start.scene());
-				} catch (Exception e) {
-					throw new RuntimeException(e);
+					initialPlanetPage.display(stage);
+				} catch (Exception exception) {
+					throw new RuntimeException(exception);
 				}
 			});
-
+			
 			// Stage
-			stage.setScene(initial.scene());
 			stage.setTitle("Terraforming");
 			stage.setWidth(825);
 			stage.setHeight(550);
 			stage.setOnCloseRequest(e->{
 				try {
-					// Save the data
-					new ObjectSerialization().save(planetDataPath, planetData);
+					
 				} catch (Exception exception) {
 					throw new RuntimeException(exception);
 				}
 			});
+			
+			// Display title page
+			titlePage.display(stage);
+			
+			// Show stage
 			stage.show();
 		} catch(Exception e) {
 			e.printStackTrace();
