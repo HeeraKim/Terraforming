@@ -76,10 +76,15 @@ public final class BaseInitialPlanetPage extends InitialPlanetPage {
 		obsStats.add(planet.node(new InitialStatPlanetNode("temperature", "c", 
 				new RangedProgressBar(-100, 90, 0, 30)
 				)));
-		//obsStats.add(planet.node(new InitialStatPlanetNode("temperature", "c", -100, 90)));
-		//obsStats.add(planet.node(new InitialStatPlanetNode("pressure", "atm", 0, 10)));
-		//obsStats.add(planet.node(new InitialStatPlanetNode("oxygenConcentration", "%", 0, 100)));
-		//obsStats.add(planet.node(new InitialStatPlanetNode("gravity", "G", 0.1, 5)));
+		obsStats.add(planet.node(new InitialStatPlanetNode("pressure", "atm", 
+				new RangedProgressBar(0, 10, 0.8, 1.2)
+				)));
+		obsStats.add(planet.node(new InitialStatPlanetNode("oxygenConcentration", "%", 
+				new RangedProgressBar(0, 100, 20, 25)
+				)));
+		obsStats.add(planet.node(new InitialStatPlanetNode("gravity", "G", 
+				new RangedProgressBar(0.1, 5, 0.9, 1.1)
+				)));
 
 		// ListView for status
 		final ListView<Node> lvStats = new ListView<>();
