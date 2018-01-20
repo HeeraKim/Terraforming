@@ -9,6 +9,7 @@ import application.planet.strategy.execution.PlanetReset;
 import application.planet.strategy.execution.PlanetSyncSlide;
 import application.planet.strategy.node.BasePlanetNode;
 import application.planet.strategy.node.InitialStatPlanetNode;
+import application.ui.RangedProgressBar;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -72,10 +73,13 @@ public final class BaseInitialPlanetPage extends InitialPlanetPage {
 
 		// Observable list for status
 		final ObservableList<Node> obsStats = FXCollections.observableArrayList();
-		obsStats.add(planet.node(new InitialStatPlanetNode("temperature", "c", -100, 90)));
-		obsStats.add(planet.node(new InitialStatPlanetNode("pressure", "atm", 0, 10)));
-		obsStats.add(planet.node(new InitialStatPlanetNode("oxygenConcentration", "%", 0, 100)));
-		obsStats.add(planet.node(new InitialStatPlanetNode("gravity", "G", 0.1, 5)));
+		obsStats.add(planet.node(new InitialStatPlanetNode("temperature", "c", 
+				new RangedProgressBar(-100, 90, 0, 30)
+				)));
+		//obsStats.add(planet.node(new InitialStatPlanetNode("temperature", "c", -100, 90)));
+		//obsStats.add(planet.node(new InitialStatPlanetNode("pressure", "atm", 0, 10)));
+		//obsStats.add(planet.node(new InitialStatPlanetNode("oxygenConcentration", "%", 0, 100)));
+		//obsStats.add(planet.node(new InitialStatPlanetNode("gravity", "G", 0.1, 5)));
 
 		// ListView for status
 		final ListView<Node> lvStats = new ListView<>();

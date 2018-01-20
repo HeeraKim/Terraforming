@@ -2,9 +2,9 @@ package application.planet.strategy.node;
 
 import application.planet.data.PlanetData;
 import application.string.base.DecamelString;
+import application.ui.CustomProgressBar;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
 
 /**
@@ -21,61 +21,40 @@ public final class InitialStatPlanetNode extends PlanetNode {
 	 * @param max
 	 * @since 1.0.0
 	 */
-	public InitialStatPlanetNode(String status, String unit, double min, double max) {
-		this.status = status;
+	public InitialStatPlanetNode(String name, String unit, CustomProgressBar progressBar) {
+		this.name = name;
 		this.unit = unit;
-		this.min = min;
-		this.max = max;
+		this.progressBar = progressBar;
 	}
 
 	@Override
 	public Node node(PlanetData planetData) throws Exception {
-		// Label to show what it is
-		final Label lStatus = new Label();
-		
-		// Progress bar
-		final ProgressBar progressBar = new ProgressBar();
+		// Label
+		final Label label = new Label();
 		
 		// GridPane as root
 		final GridPane grid = new GridPane();
-		grid.addRow(0, progressBar, lStatus);
+		grid.addRow(0, progressBar.ui(), label);
 		grid.setHgap(10);
-		
-		// Configure progress bar
-		configureNodes(planetData.number(status).doubleValue(), progressBar, lStatus);
 		
 		// Sync progress bar and data
 		planetData.addNumberEvent((key, value)->{
-			if (key.equals(status)) {
-				configureNodes(value.doubleValue(), progressBar, lStatus);
+			if (key.equals(name)) {
+				label.setText(new DecamelString(name).value()+": "+value.toString()+unit);
+				progressBar.updateValue(value.doubleValue());
 			}
 		});
 		
+		// Initial display
+		label.setText(new DecamelString(name).value()+": "+planetData.number(name).toString()+unit);
+		progressBar.updateValue(planetData.number(name).doubleValue());
+		
+		// Return root GridPane
 		return grid;
 	}
 	
-	private void configureNodes(double rawData, ProgressBar progressBar, Label lStatus) {
-		// Calculate progress
-		final double range = max - min;
-		final double adjustedValue = rawData - min;
-		final double percentage = adjustedValue / range;
-		
-		// set progress
-		progressBar.setProgress(percentage);
-		
-		// Define color
-		progressBar.setStyle("-fx-accent: red;");
-		if (percentage >= 0.4 && percentage <= 0.6) {
-			progressBar.setStyle("-fx-accent: blue;");
-		}
-		
-		// Update label
-		lStatus.setText(new DecamelString(status).value()+": "+rawData+unit);
-	}
-	
-	private final String status;
+	private final String name;
 	private final String unit;
-	private final double min;
-	private final double max;
+	private final CustomProgressBar progressBar;
 
 }
