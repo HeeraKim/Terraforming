@@ -3,6 +3,7 @@ package application.page.initialplanet;
 import java.util.ArrayList;
 import java.util.List;
 
+import application.event.PlainEvent;
 import application.planet.Planet;
 import application.planet.strategy.execution.PlanetRandomize;
 import application.planet.strategy.execution.PlanetReset;
@@ -41,6 +42,11 @@ public final class BaseInitialPlanetPage extends InitialPlanetPage {
 	@Override
 	public void display(Stage stage) throws Exception {
 		stage.setScene(this.scene());
+	}
+	
+	@Override
+	public void addNextEvent(PlainEvent event) throws Exception {
+		nextEvents.add(event);
 	}
 
 	private Scene scene() throws Exception {
@@ -98,6 +104,11 @@ public final class BaseInitialPlanetPage extends InitialPlanetPage {
 		// Button for next
 		final Button bNext = new Button("Next");
 		bNext.setMinWidth(100);
+		bNext.setOnAction(e->{
+			nextEvents.forEach(event -> {
+				event.handle();
+			});
+		});
 
 		// StackPane for next
 		final StackPane paneNext = new StackPane();
@@ -163,4 +174,5 @@ public final class BaseInitialPlanetPage extends InitialPlanetPage {
 	private final Planet planet;
 	
 	private final List<Scene> cache = new ArrayList<>();
+	private final List<PlainEvent> nextEvents = new ArrayList<>();
 }

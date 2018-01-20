@@ -1,5 +1,6 @@
 package application.page.initialplanet;
 
+import application.event.PlainEvent;
 import javafx.stage.Stage;
 
 /**
@@ -17,4 +18,12 @@ public abstract class InitialPlanetPage {
 	 * @since 1.0.0
 	 */
 	public abstract void display(Stage stage) throws Exception;
+	
+	/**
+	 * Add an event to be executed when next button is clicked.
+	 * @param event
+	 * @throws Exception
+	 * @since 1.0.0
+	 */
+	public abstract void addNextEvent(PlainEvent event) throws Exception;
 }

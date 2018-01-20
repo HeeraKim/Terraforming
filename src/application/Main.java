@@ -1,5 +1,7 @@
 package application;
 
+import application.page.initialmachine.BaseInitialMachinePage;
+import application.page.initialmachine.InitialMachinePage;
 import application.page.initialplanet.BaseInitialPlanetPage;
 import application.page.initialplanet.InitialPlanetPage;
 import application.page.title.BaseTitlePage;
@@ -22,8 +24,29 @@ public class Main extends Application {
 			// InitialPlanetPage
 			final InitialPlanetPage initialPlanetPage = new BaseInitialPlanetPage(planet);
 			
+			// InitialMachinePage
+			final InitialMachinePage initialMachinePage = new BaseInitialMachinePage();
+			
 			// From TitlePage to InitialPlanetPage
 			titlePage.addNewEvent(()->{
+				try {
+					initialPlanetPage.display(stage);
+				} catch (Exception exception) {
+					throw new RuntimeException(exception);
+				}
+			});
+			
+			// From InitialPlanetPage to InitialMachinePage
+			initialPlanetPage.addNextEvent(()->{
+				try {
+					initialMachinePage.display(stage);
+				} catch (Exception exception) {
+					throw new RuntimeException(exception);
+				}
+			});
+			
+			// From InitialMachinePage to InitialPlanetPage
+			initialMachinePage.addBackEvent(()->{
 				try {
 					initialPlanetPage.display(stage);
 				} catch (Exception exception) {
